@@ -10,7 +10,6 @@ export default function HotelListing() {
   useEffect(() => {
     if (hotels) {
       setData(hotels);
-      console.log(hotels);
     }
   }, [hotels]);
 
@@ -19,9 +18,7 @@ export default function HotelListing() {
       <h2>Primeiro, escolha seu hotel</h2>
       <ul>
         {data?.map((h) => (
-          <>
-            <HotelItem key={h.id} hotelInfo={h} />
-          </>
+          <HotelItem key={h.id} hotelInfo={h} />
         ))}
       </ul>
     </PageContainer>
