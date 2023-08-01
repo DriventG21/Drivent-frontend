@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 
 export default function HotelItem({ hotelInfo }) {
-  const { name, image, Rooms } = hotelInfo;
-  const type = findAccommodationType(Rooms);
-  const vacancy = findVacancy(Rooms);
+  const { name, image, vacancy, type } = hotelInfo;
 
   return (
     <HotelCard>
@@ -12,7 +10,7 @@ export default function HotelItem({ hotelInfo }) {
       <div>
         <div>
           <p>Tipos de acomodação:</p>
-          <span>{type}</span>
+          <span>{type.join(', ').replace(/,(?=[^,]*$)/, ' e')}</span>
         </div>
         <div>
           <p>Vagas disponíveis:</p>
@@ -77,33 +75,3 @@ const HotelCard = styled.li`
     }
   }
 `;
-
-function findAccommodationType(rooms) {
-  const result = [];
-  const hash = {};
-
-  for (let i = 0; i < rooms.length; i++) {
-    hash[rooms[i].capacity] = true;
-  }
-
-  if (hash[1]) {
-    result.push('Single');
-  }
-  if (hash[2]) {
-    result.push('Double');
-  }
-  if (hash[3]) {
-    result.push('Triple');
-  }
-
-  return result.join(', ').replace(/,(?=[^,]*$)/, ' e');
-}
-
-function findVacancy(rooms) {
-  let result = 0;
-  for (let i = 0; i < rooms.length; i++) {
-    result += rooms[i].capacity - rooms[i].Booking.length;
-  }
-
-  return result;
-}
