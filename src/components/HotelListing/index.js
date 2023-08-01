@@ -17,7 +17,7 @@ export default function HotelListing() {
     <PageContainer>
       <h2>Primeiro, escolha seu hotel</h2>
       <ul>
-        {data?.map((h) => (
+        {data && data.map((h) => (
           <HotelItem key={h.id} hotelInfo={h} />
         ))}
       </ul>
