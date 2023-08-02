@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-export default function HotelItem({ hotelInfo }) {
-  const { name, image, vacancy, type } = hotelInfo;
+export default function HotelItem({ hotelInfo, handleSelection }) {
+  const { id, name, image, vacancy, type, selected } = hotelInfo;
 
   return (
-    <HotelCard>
+    <HotelCard onClick={() => handleSelection(id)} selected={selected}>
       <img src={image} alt={name} />
       <h3>{name}</h3>
       <div>
@@ -28,7 +28,7 @@ const HotelCard = styled.li`
   min-width: 196px;
   height: 264px;
   border-radius: 10px;
-  background: #ebebeb;
+  background: ${({ selected }) => (selected ? '#FFEED2' : '#ebebeb')};
   padding: 16px 14px;
   gap: 10px;
   color: #3c3c3c;
