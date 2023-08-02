@@ -1,17 +1,23 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useHotel from '../../hooks/api/useHotel';
+import useToken from '../../hooks/useToken';
 import HotelItem from './HotelItem';
+import RoomItem from './RoomItem';
 
 export default function HotelListing() {
+  const token = useToken();
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const hotelsData = useHotel();
   const { hotels, hotelsError } = hotelsData;
+  const [rooms, setRooms] = useState(null);
 
   useEffect(() => {
     if (hotels) {
-      setData(hotels);
+      const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setData(formatedHotels);
     }
     if (hotelsError) {
       const data = hotelsError.response.data;
@@ -26,6 +32,41 @@ export default function HotelListing() {
     }
   }, [hotels, hotelsError]);
 
+  function handleSelection(hotelId) {
+    let aux = false;
+    const hotelList = data.map((h) => {
+      if (h.id === hotelId) {
+        aux = !h.selected;
+        h.selected = !h.selected;
+      } else {
+        h.selected = false;
+      }
+      return h;
+    });
+
+    setData(hotelList);
+
+    if (aux) {
+      updateRoomList(hotelId);
+    } else {
+      setRooms(null);
+    }
+  }
+
+  function updateRoomList(hotelId) {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${hotelId}`, config)
+      .then(({ data }) => {
+        setRooms(data.Rooms);
+      })
+      .catch((err) => console.log(err));
+  }
+
   return (
     <PageContainer>
       {hotels && (
@@ -33,9 +74,19 @@ export default function HotelListing() {
           <h2>Primeiro, escolha seu hotel</h2>
           <ul>
             {data.map((h) => (
-              <HotelItem key={h.id} hotelInfo={h} />
+              <HotelItem key={h.id} hotelInfo={h} handleSelection={handleSelection} />
             ))}
           </ul>
+        </>
+      )}
+      {rooms && (
+        <>
+          <h2>Ótima pedida! Agora escolha seu quarto:</h2>
+          <RoomList>
+            {rooms.map((r) => (
+              <RoomItem key={r.id} room={r} />
+            ))}
+          </RoomList>
         </>
       )}
       {error && (
@@ -102,4 +153,9 @@ const ErrorContainer = styled.div`
     width: 100%;
     gap: 0px;
   }
+`;
+
+const RoomList = styled.ul`
+  display: flex;
+  flex-wrap: wrap;
 `;
