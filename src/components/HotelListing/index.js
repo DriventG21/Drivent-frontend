@@ -6,26 +6,32 @@ import useToken from '../../hooks/useToken';
 import HotelItem from './HotelItem';
 import BookedItem from './BookedItem';
 import RoomItem from './RoomItem';
+import useUser from '../../hooks/useUser';
 import { useBooking } from '../../hooks/api/useBooking';
 
 export default function HotelListing() {
+  const { id: userId } = useUser();
   const token = useToken();
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const hotelsData = useHotel();
   const { hotels, hotelsError } = hotelsData;
   const [rooms, setRooms] = useState(null);
-  const [reservedRoom, setReservedRoom] = useState([]);
 
   const { booking: bookingData, bookingLoading, getBooking } = useBooking();
   const booking = bookingData;
+  const [bookingComplete, setBookingComplete] = useState(false);
+
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
     if (booking && !hotelsError) {
       const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setBookingComplete(true);
       setData(formatedHotels);
     } else if (hotels) {
       const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setBookingComplete(false);
       setData(formatedHotels);
     } else if (hotelsError) {
       const data = hotelsError.response.data;
@@ -46,6 +52,7 @@ export default function HotelListing() {
       if (h.id === hotelId) {
         aux = !h.selected;
         h.selected = !h.selected;
+        setSelectedRoom(null);
       } else {
         h.selected = false;
       }
@@ -75,17 +82,47 @@ export default function HotelListing() {
       .catch((err) => console.log(err));
   }
 
+  function filterUser(arr) {
+    return arr.forEach((room) => {
+      room.Booking = room.Booking.filter((b) => b.userId !== userId);
+    });
+  }
+
+  function handleChangeRoom(roomId) {
+    const roomWithoutUser = filterUser(rooms);
+
+    console.log(roomWithoutUser);
+    const newChosenRoom = roomWithoutUser.map((r) => {
+      if (r.id === roomId) {
+        return { ...r, Booking: [...r.Booking, { userId }] };
+      } else {
+        return r;
+      }
+    });
+    console.log(newChosenRoom);
+    setRooms(newChosenRoom);
+  }
+
+  async function changeBooking() {
+    setBookingComplete(false);
+  }
+
+  //Requisições diferentes para RESERVAR QUARTO (post)/CONFIRMAR TROCA(put)
+
   return (
     <PageContainer>
-      {booking && (
+      {booking && bookingComplete === true && (
         <>
           <h2>Você já escolheu seu quarto</h2>
           <ul>
             <BookedItem key={booking.Room.hotelId} bookingInfo={booking} />
           </ul>
+          <BookingButton onClick={() => changeBooking()}>
+            <h4>TROCAR DE QUARTO</h4>
+          </BookingButton>
         </>
       )}
-      {hotels && !booking &&(
+      {hotels && bookingComplete === false && (
         <>
           <h2>Primeiro, escolha seu hotel</h2>
           <ul>
@@ -100,9 +137,25 @@ export default function HotelListing() {
           <h2>Ótima pedida! Agora escolha seu quarto:</h2>
           <RoomList>
             {rooms.map((r) => (
-              <RoomItem key={r.id} room={r} />
+              <RoomItem
+                key={r.id}
+                room={r}
+                selectedRoom={selectedRoom}
+                setSelectedRoom={setSelectedRoom}
+                handleChangeRoom={handleChangeRoom}
+              />
             ))}
           </RoomList>
+          {!booking && selectedRoom && (
+            <BookingButton>
+              <h4>RESERVAR QUARTO</h4>
+            </BookingButton>
+          )}
+          {booking && selectedRoom && (
+            <BookingButton>
+              <h4>CONFIRMAR TROCA</h4>
+            </BookingButton>
+          )}
         </>
       )}
       {error && (
@@ -174,4 +227,25 @@ const ErrorContainer = styled.div`
 const RoomList = styled.ul`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const BookingButton = styled.div`
+  width: 182px;
+  height: 37px;
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px 0px #00000040;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 38px;
+  cursor: pointer;
+  h4 {
+    color: #000;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
 `;

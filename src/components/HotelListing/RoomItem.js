@@ -1,19 +1,46 @@
 import styled from 'styled-components';
 import { BsPerson, BsFillPersonFill } from 'react-icons/bs';
 import useUser from '../../hooks/useUser';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function RoomItem({ room }) {
+export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleChangeRoom }) {
   const { id: userId } = useUser();
+  console.log(room.Booking);
   const findUser = room.Booking.some((b) => b.userId === userId);
-  const [select, setSelect] = useState(findUser);
+
+  const [userIcon, setUserIcon] = useState(findUser);
+  const [select, setSelect] = useState(false);
+
   const quantity = Array.from({ length: room.capacity });
   const spots = markCapacity(quantity, room.Booking);
   const [booked, setBooked] = useState(spots);
 
+  useEffect(() => {
+    if (!selectedRoom && findUser) {
+      setSelect(true);
+    }
+    if (selectedRoom === room.id) {
+      setSelect(true);
+    } else {
+      setSelect(false);
+    }
+  }, [selectedRoom]);
+
+  const handleRoomClick = (roomId) => {
+    // handleChangeRoom(roomId);
+    setSelectedRoom(roomId);
+  };
+
+  // selectedRoom === room.id
+  // p.userId === userId
+
   return (
     <>
-      <RoomStyle disabled={quantity.length === room.Booking.length} background={select && '#FFEED2'}>
+      <RoomStyle
+        disabled={quantity.length === room.Booking.length}
+        background={select && '#FFEED2'}
+        onClick={() => handleRoomClick(room.id)}
+      >
         <div>{room.name}</div>
         <div>
           {booked.map((p, index) =>
