@@ -1,19 +1,46 @@
 import styled from 'styled-components';
 import { BsPerson, BsFillPersonFill } from 'react-icons/bs';
 import useUser from '../../hooks/useUser';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function RoomItem({ room }) {
+export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleChangeRoom }) {
   const { id: userId } = useUser();
   const findUser = room.Booking.some((b) => b.userId === userId);
-  const [select, setSelect] = useState(findUser);
+
+  const [select, setSelect] = useState(false);
+
   const quantity = Array.from({ length: room.capacity });
-  const spots = markCapacity(quantity, room.Booking);
+  const spots = markCapacity(quantity, room.Booking, userId);
   const [booked, setBooked] = useState(spots);
+
+  useEffect(() => {
+    const newSpots = markCapacity(quantity, room.Booking);
+    setBooked(newSpots);
+  }, [room]);
+
+  useEffect(() => {
+    if (!selectedRoom && findUser) {
+      setSelect(true);
+    }
+    if (selectedRoom === room.id) {
+      setSelect(true);
+    } else {
+      setSelect(false);
+    }
+  }, [selectedRoom]);
+
+  const handleRoomClick = (roomId) => {
+    handleChangeRoom(roomId);
+    setSelectedRoom(roomId);
+  };
 
   return (
     <>
-      <RoomStyle disabled={quantity.length === room.Booking.length} background={select && '#FFEED2'}>
+      <RoomStyle
+        disabled={quantity.length === room.Booking.length}
+        background={select && '#FFEED2'}
+        onClick={() => handleRoomClick(room.id)}
+      >
         <div>{room.name}</div>
         <div>
           {booked.map((p, index) =>
@@ -29,11 +56,16 @@ export default function RoomItem({ room }) {
   );
 }
 
-function markCapacity(quantity, bookings) {
+function markCapacity(quantity, bookings, userId) {
   const result = [...quantity];
+  const organizeBooking = bookings.sort((a, b) => {
+    return a.userId === userId ? 1 : b.userId === userId ? -1 : 0;
+  });
+
   for (let i = 0; i < bookings.length; i++) {
-    result[result.length - 1 - i] = bookings[i];
+    result[result.length - 1 - i] = organizeBooking[i];
   }
+
   return result;
 }
 

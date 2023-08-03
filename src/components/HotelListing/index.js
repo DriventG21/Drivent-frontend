@@ -4,22 +4,39 @@ import styled from 'styled-components';
 import useHotel from '../../hooks/api/useHotel';
 import useToken from '../../hooks/useToken';
 import HotelItem from './HotelItem';
+import BookedItem from './BookedItem';
 import RoomItem from './RoomItem';
+import useUser from '../../hooks/useUser';
+import { useBooking } from '../../hooks/api/useBooking';
 
 export default function HotelListing() {
+  const { id: userId } = useUser();
   const token = useToken();
+
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const hotelsData = useHotel();
+  let hotelsData = useHotel();
   const { hotels, hotelsError } = hotelsData;
+
   const [rooms, setRooms] = useState(null);
 
+  const { booking: bookingData, getBooking } = useBooking();
+  const booking = bookingData;
+  const [bookingComplete, setBookingComplete] = useState(false);
+
+  const [selectedRoom, setSelectedRoom] = useState(null);
+
   useEffect(() => {
-    if (hotels) {
+    getBooking();
+    if (booking && !hotelsError) {
       const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setBookingComplete(true);
       setData(formatedHotels);
-    }
-    if (hotelsError) {
+    } else if (hotels) {
+      const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setBookingComplete(false);
+      setData(formatedHotels);
+    } else if (hotelsError) {
       const data = hotelsError.response.data;
       const errorMessage = {
         'Payment Required': ['Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem'],
@@ -38,6 +55,7 @@ export default function HotelListing() {
       if (h.id === hotelId) {
         aux = !h.selected;
         h.selected = !h.selected;
+        setSelectedRoom(null);
       } else {
         h.selected = false;
       }
@@ -67,9 +85,106 @@ export default function HotelListing() {
       .catch((err) => console.log(err));
   }
 
+  function filterUser() {
+    const filtered = [];
+    for (let i = 0; i < rooms.length; i++) {
+      const room = {
+        ...rooms[i],
+        Booking: rooms[i].Booking.filter((b) => b.userId !== userId),
+      };
+      filtered.push(room);
+    }
+    return filtered;
+  }
+
+  function handleChangeRoom(roomId) {
+    const roomWithoutUser = filterUser();
+    const newChosenRoom = roomWithoutUser.map((r) => {
+      if (r.id === roomId) {
+        return { ...r, Booking: [...r.Booking, { userId }] };
+      } else {
+        return r;
+      }
+    });
+    setRooms(newChosenRoom);
+  }
+
+  async function changeBooking() {
+    updateHotels();
+    setRooms(null);
+    setBookingComplete(false);
+  }
+
+  function updateHotels() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels`, config)
+      .then(({ data }) => {
+        setData(data);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  async function postBooking() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const body = {
+      roomId: selectedRoom,
+    };
+    try {
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/booking`, body, config).catch((err) => console.log(err));
+      await getBooking();
+      setBookingComplete(true);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function updateBooking() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const body = {
+      roomId: selectedRoom,
+    };
+    try {
+      if (selectedRoom === booking.Room.id) {
+        return true;
+      }
+      await axios
+        .put(`${process.env.REACT_APP_API_BASE_URL}/booking/${booking.id}`, body, config)
+        .catch((err) => console.log(err));
+      await getBooking();
+      //
+      setBookingComplete(true);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <PageContainer>
-      {hotels && (
+      {booking && bookingComplete === true && (
+        <>
+          <h2>Você já escolheu seu quarto</h2>
+          <ul>
+            <BookedItem key={booking.Room.hotelId} bookingInfo={booking} />
+          </ul>
+          <BookingButton onClick={() => changeBooking()}>
+            <h4>TROCAR DE QUARTO</h4>
+          </BookingButton>
+        </>
+      )}
+      {hotels && bookingComplete === false && (
         <>
           <h2>Primeiro, escolha seu hotel</h2>
           <ul>
@@ -79,14 +194,30 @@ export default function HotelListing() {
           </ul>
         </>
       )}
-      {rooms && (
+      {rooms && bookingComplete === false && (
         <>
           <h2>Ótima pedida! Agora escolha seu quarto:</h2>
           <RoomList>
             {rooms.map((r) => (
-              <RoomItem key={r.id} room={r} />
+              <RoomItem
+                key={r.id}
+                room={r}
+                selectedRoom={selectedRoom}
+                setSelectedRoom={setSelectedRoom}
+                handleChangeRoom={handleChangeRoom}
+              />
             ))}
           </RoomList>
+          {!booking && selectedRoom && (
+            <BookingButton onClick={() => postBooking()}>
+              <h4>RESERVAR QUARTO</h4>
+            </BookingButton>
+          )}
+          {booking && selectedRoom && (
+            <BookingButton onClick={() => updateBooking()}>
+              <h4>CONFIRMAR TROCA</h4>
+            </BookingButton>
+          )}
         </>
       )}
       {error && (
@@ -158,4 +289,25 @@ const ErrorContainer = styled.div`
 const RoomList = styled.ul`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const BookingButton = styled.div`
+  width: 182px;
+  height: 37px;
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px 0px #00000040;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 38px;
+  cursor: pointer;
+  h4 {
+    color: #000;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
 `;
