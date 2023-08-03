@@ -12,10 +12,12 @@ import { useBooking } from '../../hooks/api/useBooking';
 export default function HotelListing() {
   const { id: userId } = useUser();
   const token = useToken();
+
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const hotelsData = useHotel();
+  let hotelsData = useHotel();
   const { hotels, hotelsError } = hotelsData;
+
   const [rooms, setRooms] = useState(null);
 
   const { booking: bookingData, getBooking } = useBooking();
@@ -108,7 +110,23 @@ export default function HotelListing() {
   }
 
   async function changeBooking() {
+    updateHotels();
+    setRooms(null);
     setBookingComplete(false);
+  }
+
+  function updateHotels() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels`, config)
+      .then(({ data }) => {
+        setData(data);
+      })
+      .catch((err) => console.log(err));
   }
 
   async function postBooking() {
@@ -146,6 +164,7 @@ export default function HotelListing() {
         .put(`${process.env.REACT_APP_API_BASE_URL}/booking/${booking.id}`, body, config)
         .catch((err) => console.log(err));
       await getBooking();
+      //
       setBookingComplete(true);
     } catch (err) {
       console.log(err);
