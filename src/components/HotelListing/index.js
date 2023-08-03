@@ -4,7 +4,9 @@ import styled from 'styled-components';
 import useHotel from '../../hooks/api/useHotel';
 import useToken from '../../hooks/useToken';
 import HotelItem from './HotelItem';
+import BookedItem from './BookedItem';
 import RoomItem from './RoomItem';
+import { useBooking } from '../../hooks/api/useBooking';
 
 export default function HotelListing() {
   const token = useToken();
@@ -13,13 +15,19 @@ export default function HotelListing() {
   const hotelsData = useHotel();
   const { hotels, hotelsError } = hotelsData;
   const [rooms, setRooms] = useState(null);
+  const [reservedRoom, setReservedRoom] = useState([]);
+
+  const { booking: bookingData, bookingLoading, getBooking } = useBooking();
+  const booking = bookingData;
 
   useEffect(() => {
-    if (hotels) {
+    if (booking && !hotelsError) {
       const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
       setData(formatedHotels);
-    }
-    if (hotelsError) {
+    } else if (hotels) {
+      const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
+      setData(formatedHotels);
+    } else if (hotelsError) {
       const data = hotelsError.response.data;
       const errorMessage = {
         'Payment Required': ['Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem'],
@@ -69,7 +77,15 @@ export default function HotelListing() {
 
   return (
     <PageContainer>
-      {hotels && (
+      {booking && (
+        <>
+          <h2>Você já escolheu seu quarto</h2>
+          <ul>
+            <BookedItem key={booking.Room.hotelId} bookingInfo={booking} />
+          </ul>
+        </>
+      )}
+      {hotels && !booking &&(
         <>
           <h2>Primeiro, escolha seu hotel</h2>
           <ul>
