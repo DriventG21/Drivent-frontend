@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleChangeRoom }) {
   const { id: userId } = useUser();
-  console.log(room.Booking);
   const findUser = room.Booking.some((b) => b.userId === userId);
 
   const [userIcon, setUserIcon] = useState(findUser);
@@ -14,6 +13,11 @@ export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleCh
   const quantity = Array.from({ length: room.capacity });
   const spots = markCapacity(quantity, room.Booking);
   const [booked, setBooked] = useState(spots);
+
+  useEffect(() => {
+    const newSpots = markCapacity(quantity, room.Booking);
+    setBooked(newSpots);
+  }, [room]);
 
   useEffect(() => {
     if (!selectedRoom && findUser) {
@@ -27,12 +31,9 @@ export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleCh
   }, [selectedRoom]);
 
   const handleRoomClick = (roomId) => {
-    // handleChangeRoom(roomId);
+    handleChangeRoom(roomId);
     setSelectedRoom(roomId);
   };
-
-  // selectedRoom === room.id
-  // p.userId === userId
 
   return (
     <>

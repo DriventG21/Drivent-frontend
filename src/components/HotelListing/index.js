@@ -82,14 +82,20 @@ export default function HotelListing() {
       .catch((err) => console.log(err));
   }
 
-  function filterUser(arr) {
-    return arr.forEach((room) => {
-      room.Booking = room.Booking.filter((b) => b.userId !== userId);
-    });
+  function filterUser() {
+    const filtered = [];
+    for (let i = 0; i < rooms.length; i++) {
+      const room = {
+        ...rooms[i],
+        Booking: rooms[i].Booking.filter((b) => b.userId !== userId),
+      };
+      filtered.push(room);
+    }
+    return filtered;
   }
 
   function handleChangeRoom(roomId) {
-    const roomWithoutUser = filterUser(rooms);
+    const roomWithoutUser = filterUser();
 
     console.log(roomWithoutUser);
     const newChosenRoom = roomWithoutUser.map((r) => {
