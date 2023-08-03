@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export default function BookedItem({ bookingInfo    }) {
+export default function BookedItem({ bookingInfo }) {
   const room = bookingInfo.Room;
   // const { id, name, image, vacancy, type, selected } = hotelInfo;
 
@@ -13,23 +13,20 @@ export default function BookedItem({ bookingInfo    }) {
     accomodation_type = '(Triple)';
   }
 
-  let other_people_in_room = '';
-  if (room.Booking.length > 1) {
-    other_people_in_room = `e mais ${room.Booking.length - 1} pessoas`;
-  }
-
   return (
     <HotelCard selected={true}>
-      <img src={room.Hotel.image} alt={room.Hotel.image}/>
+      <img src={room.Hotel.image} alt={room.Hotel.image} />
       <h3>{room.Hotel.name}</h3>
       <div>
         <div>
           <p>Quarto reservado:</p>
-          <span>{room.name} {accomodation_type}</span>
+          <span>
+            {room.name} {accomodation_type}
+          </span>
         </div>
         <div>
           <p>Pessoas no seu quarto:</p>
-          <span>Você {other_people_in_room}</span>
+          <span>{room.Booking.length > 1 ? `Você e mais ${room.Booking.length - 1} pessoas` : 'Somente você'}</span>
         </div>
       </div>
     </HotelCard>
