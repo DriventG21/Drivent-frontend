@@ -10,7 +10,7 @@ export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleCh
   const [select, setSelect] = useState(false);
 
   const quantity = Array.from({ length: room.capacity });
-  const spots = markCapacity(quantity, room.Booking);
+  const spots = markCapacity(quantity, room.Booking, userId);
   const [booked, setBooked] = useState(spots);
 
   useEffect(() => {
@@ -56,11 +56,16 @@ export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleCh
   );
 }
 
-function markCapacity(quantity, bookings) {
+function markCapacity(quantity, bookings, userId) {
   const result = [...quantity];
+  const organizeBooking = bookings.sort((a, b) => {
+    return a.userId === userId ? 1 : b.userId === userId ? -1 : 0;
+  });
+
   for (let i = 0; i < bookings.length; i++) {
-    result[result.length - 1 - i] = bookings[i];
+    result[result.length - 1 - i] = organizeBooking[i];
   }
+
   return result;
 }
 

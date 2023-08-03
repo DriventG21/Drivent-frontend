@@ -18,13 +18,14 @@ export default function HotelListing() {
   const { hotels, hotelsError } = hotelsData;
   const [rooms, setRooms] = useState(null);
 
-  const { booking: bookingData } = useBooking();
+  const { booking: bookingData, getBooking } = useBooking();
   const booking = bookingData;
   const [bookingComplete, setBookingComplete] = useState(false);
 
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
+    getBooking();
     if (booking && !hotelsError) {
       const formatedHotels = hotels.map((e) => ({ ...e, selected: false }));
       setBookingComplete(true);
@@ -96,8 +97,6 @@ export default function HotelListing() {
 
   function handleChangeRoom(roomId) {
     const roomWithoutUser = filterUser();
-
-    console.log(roomWithoutUser);
     const newChosenRoom = roomWithoutUser.map((r) => {
       if (r.id === roomId) {
         return { ...r, Booking: [...r.Booking, { userId }] };
@@ -105,7 +104,6 @@ export default function HotelListing() {
         return r;
       }
     });
-    console.log(newChosenRoom);
     setRooms(newChosenRoom);
   }
 
@@ -113,7 +111,46 @@ export default function HotelListing() {
     setBookingComplete(false);
   }
 
-  //Requisições diferentes para RESERVAR QUARTO (post)/CONFIRMAR TROCA(put)
+  async function postBooking() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const body = {
+      roomId: selectedRoom,
+    };
+    try {
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/booking`, body, config).catch((err) => console.log(err));
+      await getBooking();
+      setBookingComplete(true);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function updateBooking() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const body = {
+      roomId: selectedRoom,
+    };
+    try {
+      if (selectedRoom === booking.Room.id) {
+        return true;
+      }
+      await axios
+        .put(`${process.env.REACT_APP_API_BASE_URL}/booking/${booking.id}`, body, config)
+        .catch((err) => console.log(err));
+      await getBooking();
+      setBookingComplete(true);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <PageContainer>
@@ -138,7 +175,7 @@ export default function HotelListing() {
           </ul>
         </>
       )}
-      {rooms && (
+      {rooms && bookingComplete === false && (
         <>
           <h2>Ótima pedida! Agora escolha seu quarto:</h2>
           <RoomList>
@@ -153,12 +190,12 @@ export default function HotelListing() {
             ))}
           </RoomList>
           {!booking && selectedRoom && (
-            <BookingButton>
+            <BookingButton onClick={() => postBooking()}>
               <h4>RESERVAR QUARTO</h4>
             </BookingButton>
           )}
           {booking && selectedRoom && (
-            <BookingButton>
+            <BookingButton onClick={() => updateBooking()}>
               <h4>CONFIRMAR TROCA</h4>
             </BookingButton>
           )}
