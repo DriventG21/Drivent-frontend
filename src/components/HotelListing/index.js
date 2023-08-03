@@ -18,7 +18,7 @@ export default function HotelListing() {
   const { hotels, hotelsError } = hotelsData;
   const [rooms, setRooms] = useState(null);
 
-  const { booking: bookingData, bookingLoading, getBooking } = useBooking();
+  const { booking: bookingData } = useBooking();
   const booking = bookingData;
   const [bookingComplete, setBookingComplete] = useState(false);
 

@@ -7,7 +7,6 @@ export default function RoomItem({ room, selectedRoom, setSelectedRoom, handleCh
   const { id: userId } = useUser();
   const findUser = room.Booking.some((b) => b.userId === userId);
 
-  const [userIcon, setUserIcon] = useState(findUser);
   const [select, setSelect] = useState(false);
 
   const quantity = Array.from({ length: room.capacity });
