@@ -1,16 +1,22 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-export default function Tickets({ enrollment, ticketTypes, config }) {
-  const [isRemote, setIsRemote] = useState('');
-  const [includesHotel, setIncludesHotel] = useState('');
+export default function Tickets({ 
+  enrollment, 
+  ticketTypes, 
+  isRemote, 
+  setIsRemote, 
+  includesHotel, 
+  setIncludesHotel, 
+  typePrice, 
+  setTypePrice,
+  hotelPrice,
+  setHotelPrice, 
+  handleSubmit 
+}) {
   const [types, setTypes] = useState();
   const [hotels, setHotels] = useState();
   const [notRemoteWithoutHotelPrice, setNotRemoteWithoutHotelPrice] = useState(0);
-
-  const [typePrice, setTypePrice] = useState(0);
-  const [hotelPrice, setHotelPrice] = useState(0);
 
   useEffect(() => {
     formatTypes();
@@ -79,21 +85,6 @@ export default function Tickets({ enrollment, ticketTypes, config }) {
   function handleHotelClick(hotel) {
     setIncludesHotel(hotel.hotel);
     setHotelPrice(hotel.price);
-  }
-
-  function handleSubmit() {
-    let ticketTypeId;
-
-    if (includesHotel === '') setIncludesHotel(false);
-
-    ticketTypes?.forEach((type) => {
-      if (type.isRemote === isRemote && type.includesHotel === includesHotel) ticketTypeId = type.id;
-    });
-
-    axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/tickets`, { ticketTypeId }, config)
-      .then((res) => alert('deu certo'))
-      .catch((err) => alert('deu errado'));
   }
 
   return (
