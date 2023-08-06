@@ -27,8 +27,6 @@ export default function Payment() {
     findTicketTypes();
   }, []);
 
-  console.log(userTicket);
-
   function checkUserTicket() {
     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets`, config).then((res) => {
       setUserTicket(res.data);
