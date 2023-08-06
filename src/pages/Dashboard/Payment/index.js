@@ -13,6 +13,7 @@ export default function Payment() {
   const [typePrice, setTypePrice] = useState(0);
   const [hotelPrice, setHotelPrice] = useState(0);
   const [controlPage, setControlPage] = useState(0);
+  const [userTicket, setUserTicket] = useState();
   const token = useToken();
   const config = {
     headers: {
@@ -21,9 +22,17 @@ export default function Payment() {
   };
 
   useEffect(() => {
+    checkUserTicket();
     findEnrollment();
     findTicketTypes();
   }, []);
+
+  function checkUserTicket() {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets`, config).then((res) => {
+      setUserTicket(res.data);
+      if (res.data.status === 'RESERVED') setControlPage(1);
+    });
+  }
 
   function findEnrollment() {
     axios.get(`${process.env.REACT_APP_API_BASE_URL}/enrollments`, config).then((res) => setEnrollment(res.data));
@@ -51,21 +60,24 @@ export default function Payment() {
       .catch((err) => toast('Não foi possível reservar seu ingresso'));
   }
 
-  if(controlPage === 0) {
-    return <Tickets 
-      enrollment={enrollment} 
-      ticketTypes={ticketTypes} 
-      config={config}
-      isRemote={isRemote} 
-      setIsRemote={setIsRemote}
-      includesHotel={includesHotel} 
-      setIncludesHotel={setIncludesHotel}
-      typePrice={typePrice}
-      setTypePrice={setTypePrice}
-      hotelPrice={hotelPrice}
-      setHotelPrice={setHotelPrice}
-      handleSubmit={handleSubmit}
-    />;
+  if (controlPage === 0) {
+    return (
+      <Tickets
+        enrollment={enrollment}
+        ticketTypes={ticketTypes}
+        config={config}
+        isRemote={isRemote}
+        setIsRemote={setIsRemote}
+        includesHotel={includesHotel}
+        setIncludesHotel={setIncludesHotel}
+        typePrice={typePrice}
+        setTypePrice={setTypePrice}
+        hotelPrice={hotelPrice}
+        setHotelPrice={setHotelPrice}
+        handleSubmit={handleSubmit}
+        userTicket={userTicket}
+      />
+    );
   }
 
   if(controlPage === 1) {

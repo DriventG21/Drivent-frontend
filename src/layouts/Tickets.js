@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-export default function Tickets({ 
-  enrollment, 
-  ticketTypes, 
-  isRemote, 
-  setIsRemote, 
-  includesHotel, 
-  setIncludesHotel, 
-  typePrice, 
+export default function Tickets({
+  enrollment,
+  ticketTypes,
+  isRemote,
+  setIsRemote,
+  includesHotel,
+  setIncludesHotel,
+  typePrice,
   setTypePrice,
   hotelPrice,
-  setHotelPrice, 
-  handleSubmit 
+  setHotelPrice,
+  handleSubmit,
+  userTicket,
 }) {
   const [types, setTypes] = useState();
   const [hotels, setHotels] = useState();
@@ -88,10 +89,28 @@ export default function Tickets({
   }
 
   return (
-    <Container enrollment={enrollment}>
+    <Container enrollment={enrollment} status={userTicket?.status}>
       <Header>Ingresso e pagamento</Header>
       {!enrollment ? (
         <NoEnrollment>Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso</NoEnrollment>
+      ) : userTicket?.status === 'PAID' ? (
+        <NoEnrollment>
+          Você já possui um ingresso! Por favor, siga para as próximas etapas
+          <Ticket>
+            <span>Seu ingresso:</span>
+            <div className="ticket-data">
+              <div className="data">
+                <span>Modalidade: {userTicket?.TicketType.isRemote ? 'Online' : 'Presencial'}</span>
+                <span>Total: R$ {userTicket?.TicketType.price}</span>
+              </div>
+              <div className="line" />
+              <div className="data">
+                <span>Hotel: {userTicket?.TicketType.includesHotel ? 'Incluso' : 'Não incluso'}</span>
+                <span>Status: {userTicket?.status === 'PAID' ? 'Pago' : 'Reservado'}</span>
+              </div>
+            </div>
+          </Ticket>
+        </NoEnrollment>
       ) : (
         <>
           <TypesContainer>
@@ -146,10 +165,45 @@ const Container = styled.div`
   font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
-  align-items: ${(props) => (!props.enrollment ? 'center' : 'inherit')};
-  justify-content: ${(props) => (!props.enrollment ? 'center' : 'inherit')};
+  align-items: ${(props) => (!props.enrollment || props.status === 'PAID' ? 'center' : 'inherit')};
+  justify-content: ${(props) => (!props.enrollment || props.status === 'PAID' ? 'center' : 'inherit')};
 
   position: relative;
+`;
+
+const Ticket = styled.div`
+  height: 200px;
+  width: 400px;
+  border: 1px solid #cecece;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+
+  .ticket-data {
+    height: 100px;
+    width: 300px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .line {
+    height: 75px;
+    border: 1px solid #cecece;
+  }
+
+  .data {
+    height: 100%;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
 `;
 
 const Header = styled.span`
@@ -164,9 +218,14 @@ const Header = styled.span`
 
 const NoEnrollment = styled.span`
   width: 400px;
+  height: 300px;
   font-size: 20px;
   text-align: center;
   color: #8e8e8e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const TypesContainer = styled.div`
