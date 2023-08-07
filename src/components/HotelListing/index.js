@@ -45,7 +45,7 @@ export default function HotelListing() {
           'Prossiga para a escolha de atividades',
         ],
       };
-      setError(errorMessage[data]);
+      setError(errorMessage[data] || errorMessage['Payment Required']);
     }
   }, [hotels, hotelsError]);
 
