@@ -1,37 +1,44 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Loader from 'react-loader-spinner';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import useCertificate from '../../../hooks/api/useCertificate';
 import useGenCertificate from '../../../hooks/api/useGenCertificate';
+import pdfGen from '../../../utils/PDFGenerator';
 
 export default function Certificate() {
-  const { certificateError } = useCertificate();
+  const { certificateError, certificateLoading } = useCertificate();
   const [errorMsg, setErrorMsg] = useState(null);
   const { genCertificate } = useGenCertificate();
   const [loading, setLoading] = useState(false);
+  const [firstLoading, setFirstLoading] = useState(false);
 
   useEffect(() => {
-    if (certificateError) {
-      const errors = {
-        'Ticket not paid': 'Você não participou do evento.',
-        'Event is still ongoing': 'O certificado ficará disponível apenas 1 dia após a realização do evento.',
-      };
-      setErrorMsg(errors[certificateError.response.data]);
-    } else {
-      setErrorMsg(null);
+    if (!certificateLoading) {
+      if (certificateError) {
+        const errors = {
+          'Ticket not paid': 'Você não participou do evento.',
+          'Event is still ongoing': 'O certificado ficará disponível apenas 1 dia após a realização do evento.',
+        };
+        setErrorMsg(errors[certificateError.response.data]);
+      }
+      setFirstLoading(true);
     }
-  }, [certificateError]);
+  }, [certificateLoading]);
 
   async function generateCertificate() {
     setLoading(true);
     try {
       const userCertData = await genCertificate();
-      const { event, logo, startsAt, endsAt, ticketType, user } = userCertData;
+      await pdfGen(userCertData);
 
       setLoading(false);
     } catch (error) {
-      console.log(error.response);
-      setLoading(false);
+      const errors = {
+        'Not enough activities enrolled': 'Sem atividades suficiente',
+      };
+      toast(errors[error.response.data] || 'Ocorreu um erro');
     }
   }
 
@@ -39,19 +46,29 @@ export default function Certificate() {
     <DashboardContainer>
       <PageContainer>
         <h1>Certificado</h1>
-        {!errorMsg ? (
+        {!firstLoading && (
+          <ErrorContainer>
+            <ul>
+              <Loader height={36} width={36} color="#848484" type="Oval" />
+            </ul>
+          </ErrorContainer>
+        )}
+        {errorMsg && firstLoading ? (
           <ErrorContainer>
             <ul>
               <div>{errorMsg}</div>
             </ul>
           </ErrorContainer>
         ) : (
-          <>
-            <h2>Clique no botão abaixo para gerar seu certificado de participação.</h2>
-            <PDFBTN disabled={loading} onClick={generateCertificate}>
-              GERAR CERTIFICADO
-            </PDFBTN>
-          </>
+          !errorMsg &&
+          firstLoading && (
+            <>
+              <h2>Clique no botão abaixo para gerar seu certificado de participação.</h2>
+              <PDFBTN disabled={loading} onClick={generateCertificate}>
+                GERAR CERTIFICADO
+              </PDFBTN>
+            </>
+          )
         )}
       </PageContainer>
     </DashboardContainer>
@@ -149,4 +166,7 @@ const PDFBTN = styled.button`
   line-height: 16px;
   letter-spacing: 0em;
   text-align: center;
+  :disabled {
+    cursor: default;
+  }
 `;
