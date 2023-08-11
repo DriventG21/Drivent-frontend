@@ -25,7 +25,7 @@ export default function ActivitiesContainer({ activities: realActivities }) {
     const selectedActivity = activities.find(e => e.id === id);
     if (isUserTimeFree(selectedActivity)) toast('Inscrito em outra atividade neste horario');
     else {
-      postRegisterInActivity({ activityId: id + 1000 });
+      postRegisterInActivity({ activityId: id });
     }
   }
 
