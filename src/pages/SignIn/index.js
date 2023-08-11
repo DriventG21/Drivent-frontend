@@ -2,13 +2,14 @@ import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { FaGithub } from 'react-icons/fa';
 
 import AuthLayout from '../../layouts/Auth';
 
 import Input from '../../components/Form/Input';
 import Button from '../../components/Form/Button';
 import Link from '../../components/Link';
-import { Row, Title, Label, GithubButton } from '../../components/Auth';
+import { Row, Title, Label, GithubButton, GithubText } from '../../components/Auth';
 
 import EventInfoContext from '../../contexts/EventInfoContext';
 import UserContext from '../../contexts/UserContext';
@@ -31,7 +32,9 @@ export default function SignIn() {
     const urlParams = new URLSearchParams(queryString);
     const reqParams = urlParams.get('code');
     if (reqParams) {
-      const { data: userData } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/auth/sign-in/github/${reqParams}`);
+      const { data: userData } = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/auth/sign-in/github/${reqParams}`
+      );
       setUserData(userData);
       navigate('/dashboard');
       toast('Login realizado com sucesso!');
@@ -41,7 +44,7 @@ export default function SignIn() {
   useEffect(() => {
     getUserData();
   }, [setUserData, toast, navigate]);
-  
+
   async function submit(event) {
     event.preventDefault();
 
@@ -54,7 +57,7 @@ export default function SignIn() {
       toast('Não foi possível fazer o login!');
     }
   }
-  
+
   function loginWithGithub() {
     window.location.assign(`
     https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`);
@@ -84,7 +87,11 @@ export default function SignIn() {
       </Row>
       <Row>
         <Link to="/enroll">Não possui login? Inscreva-se</Link>
-        <GithubButton onClick={loginWithGithub}>Login com GitHub</GithubButton>
+        <GithubButton onClick={loginWithGithub}>
+          <FaGithub />
+          <GithubText>LOGIN COM GITHUB
+          </GithubText>
+        </GithubButton>
       </Row>
     </AuthLayout>
   );

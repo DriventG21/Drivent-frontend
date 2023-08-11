@@ -1,12 +1,13 @@
 import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { FaGithub } from 'react-icons/fa';
 
 import AuthLayout from '../../layouts/Auth';
 
 import Input from '../../components/Form/Input';
 import Button from '../../components/Form/Button';
-import { Row, Title, Label, GithubButton } from '../../components/Auth';
+import { Row, Title, Label, GithubButton, GithubText } from '../../components/Auth';
 import Link from '../../components/Link';
 
 import EventInfoContext from '../../contexts/EventInfoContext';
@@ -21,7 +22,7 @@ export default function Enroll() {
   const { loadingSignUp, signUp } = useSignUp();
 
   const navigate = useNavigate();
-  
+
   const { eventInfo } = useContext(EventInfoContext);
 
   async function submit(event) {
@@ -54,15 +55,34 @@ export default function Enroll() {
       <Row>
         <Label>Inscrição</Label>
         <form onSubmit={submit}>
-          <Input label="E-mail" type="text" fullWidth value={email} onChange={e => setEmail(e.target.value)} />
-          <Input label="Senha" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} />
-          <Input label="Repita sua senha" type="password" fullWidth value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-          <Button type="submit" color="primary" fullWidth disabled={loadingSignUp}>Inscrever</Button>
+          <Input label="E-mail" type="text" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input
+            label="Senha"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Input
+            label="Repita sua senha"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <Button type="submit" color="primary" fullWidth disabled={loadingSignUp}>
+            Inscrever
+          </Button>
         </form>
       </Row>
       <Row>
         <Link to="/sign-in">Já está inscrito? Faça login</Link>
-        <GithubButton onClick={loginWithGithub}>Login com GitHub</GithubButton>
+        <GithubButton onClick={loginWithGithub}>
+          <FaGithub />
+          <GithubText>
+            LOGIN COM GITHUB
+          </GithubText>
+        </GithubButton>
       </Row>
     </AuthLayout>
   );
