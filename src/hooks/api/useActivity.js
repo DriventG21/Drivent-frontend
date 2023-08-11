@@ -8,14 +8,14 @@ export default function useActivity() {
 
   const {
     data: activities,
-    loading: activityiesLoading,
+    loading: activitiesLoading,
     error: activitiesError,
     act: getActivities
   } = useAsync(() => activityApi.getActivities(token));
 
   return {
     activities,
-    activityiesLoading,
+    activitiesLoading,
     activitiesError,
     getActivities
   };

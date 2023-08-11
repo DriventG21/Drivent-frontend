@@ -17,6 +17,8 @@ const weekDays = [
 export default function ActivityListing() {
   const {
     activities,
+    activitiesError,
+    activitiesLoading,
     getActivities
   } = useActivity();
 
@@ -43,11 +45,29 @@ export default function ActivityListing() {
     setSelectedDate(date);
   }
 
+  if (activitiesError?.status === 402) {
+    return (
+      <ErrorContainer>
+        <p>Você precisa ter confirmado pagamento antes
+          de fazer a escolha de atividades</p>
+      </ErrorContainer>
+    );
+  }
+
+  if (activitiesError?.status === 400) {
+    return (
+      <ErrorContainer>
+        <p>Sua modalidade de ingresso não necessita escolher
+          atividade. Você terá acesso a todas as atividades.</p>
+      </ErrorContainer>
+    );
+  }
+
   return (
     <PageContainer>
       <h2>Primeiro, filtre pelo dia do evento:</h2>
 
-      {dates ?
+      {dates && !activitiesLoading ?
         <DatesContainer>
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
@@ -94,5 +114,18 @@ const PageContainer = styled.div`
       background-color: #c9c6c6;
       border-radius: 4px;
     }
+  }
+`;
+
+const ErrorContainer = styled(PageContainer)`
+  justify-content: center;
+  align-items: center;
+
+  p{
+    color: #8E8E8E;
+    text-align: center;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
   }
 `;
