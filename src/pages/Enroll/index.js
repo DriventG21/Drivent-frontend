@@ -78,7 +78,7 @@ export default function Enroll() {
       <Row>
         <Link to="/sign-in">Já está inscrito? Faça login</Link>
         <GithubButton onClick={loginWithGithub}>
-          <FaGithub />
+          <FaGithub size={20} color={'white'}/>
           <GithubText>
             LOGIN COM GITHUB
           </GithubText>
