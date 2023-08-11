@@ -14,7 +14,7 @@ const PageContainerStyle = styled.div`
   display: flex;
   flex-direction: column;
   gap: 36px;
-  max-height: 100%;
+  height: 100%;
   overflow-y: scroll;
   
   ::-webkit-scrollbar {

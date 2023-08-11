@@ -24,8 +24,8 @@ const MyButton = styled.button`
   border: none;
   color: #000000;
   text-align: center;
-  font-family: Roboto;
-  font-size: 15px;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 16px;
   font-weight: 400;
   cursor: pointer;
 `;

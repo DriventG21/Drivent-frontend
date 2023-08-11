@@ -32,7 +32,9 @@ export default function ActivityListing() {
       const dates = [];
       console.log(activities);
       for (const i of activities) {
-        const weekDay = weekDays[new Date(i.startAt).getDay()];
+        i.startAtDateTime = new Date(i.startAt);
+        i.endAtDateTime = new Date(i.endAt);
+        const weekDay = weekDays[i.startAtDateTime.getDay()];
         const day = i.startAt.substring(5, 10).split('-').reverse().join('/');
         const dayWithWeekDay = `${weekDay}, ${day}`;
         i.dayWithWeekDay = dayWithWeekDay;
@@ -55,7 +57,7 @@ export default function ActivityListing() {
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
         : null}
-      {selectedDate ? <ActivitiesContainer activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
+      {selectedDate ? <ActivitiesContainer key={selectedDate} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
