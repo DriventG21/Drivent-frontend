@@ -9,6 +9,8 @@ import RoomItem from './RoomItem';
 import useUser from '../../hooks/useUser';
 import { useBooking } from '../../hooks/api/useBooking';
 
+/* eslint no-console:0 */
+
 export default function HotelListing() {
   const { id: userId } = useUser();
   const token = useToken();
