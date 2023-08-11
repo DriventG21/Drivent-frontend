@@ -6,7 +6,7 @@ import AuthLayout from '../../layouts/Auth';
 
 import Input from '../../components/Form/Input';
 import Button from '../../components/Form/Button';
-import { Row, Title, Label } from '../../components/Auth';
+import { Row, Title, Label, GithubButton } from '../../components/Auth';
 import Link from '../../components/Link';
 
 import EventInfoContext from '../../contexts/EventInfoContext';
@@ -40,6 +40,11 @@ export default function Enroll() {
     }
   }
 
+  function loginWithGithub() {
+    window.location.assign(`
+    https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`);
+  }
+
   return (
     <AuthLayout background={eventInfo.backgroundImageUrl}>
       <Row>
@@ -57,6 +62,7 @@ export default function Enroll() {
       </Row>
       <Row>
         <Link to="/sign-in">Já está inscrito? Faça login</Link>
+        <GithubButton onClick={loginWithGithub}>Login com GitHub</GithubButton>
       </Row>
     </AuthLayout>
   );
