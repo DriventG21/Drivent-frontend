@@ -40,7 +40,7 @@ export default function ActivityCard({ activity, registerInActivity }) {
           </IconContainer>
       }
     </MyCard>
-  )
+  );
 }
 
 const InfoContainer = styled.div`

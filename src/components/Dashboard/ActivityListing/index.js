@@ -12,13 +12,11 @@ const weekDays = [
   'Quinta',
   'Sexta',
   'Sábado',
-]
+];
 
 export default function ActivityListing() {
   const {
     activities,
-    activitiesError,
-    activityiesLoading,
     getActivities
   } = useActivity();
 
@@ -54,7 +52,7 @@ export default function ActivityListing() {
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
         : null}
-      {selectedDate ? <ActivitiesContainer key={selectedDate} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
+      {selectedDate ? <ActivitiesContainer key={selectedDate} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
