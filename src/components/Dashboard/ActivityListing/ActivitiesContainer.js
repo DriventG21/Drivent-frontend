@@ -11,8 +11,8 @@ export default function ActivitiesContainer({ activities: realActivities }) {
   const { postActivityLoading, postActivityError, postRegisterInActivity } = useRegisterInActivity()
 
   useEffect(() => {
-    toast(postActivityError.response.data);
-  }, postActivityError)
+    if (postActivityError) toast(postActivityError.response.data);
+  }, [postActivityError])
 
   useEffect(() => {
     setActivities(activities.map(e => {
