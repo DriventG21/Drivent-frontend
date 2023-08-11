@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useActivity from '../../../hooks/api/useActivity';
 import DateButton from './DateButton.js';
+import ActivitiesContainer from './ActivitiesContainer.js';
 
 /* eslint-disable */ /////////////////////////////////////////////////////////
 
@@ -33,8 +34,8 @@ export default function ActivityListing() {
       for (const i of activities) {
         const weekDay = weekDays[new Date(i.startAt).getDay()];
         const day = i.startAt.substring(5, 10).split('-').reverse().join('/');
-        i.dayMonth = day;
         const dayWithWeekDay = `${weekDay}, ${day}`;
+        i.dayWithWeekDay = dayWithWeekDay;
         if (!dates.includes(dayWithWeekDay)) dates.push(dayWithWeekDay);
       }
       setDates(dates);
@@ -43,16 +44,18 @@ export default function ActivityListing() {
 
   function dateClickHandler(date) {
     setSelectedDate(date);
-    console.log(date);
   }
 
   return (
     <PageContainer>
       <h2>Primeiro, filtre pelo dia do evento:</h2>
-      <DatesContainer>
-        {dates ? dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)
-          : null}
-      </DatesContainer>
+
+      {dates ?
+        <DatesContainer>
+          {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
+        </DatesContainer>
+        : null}
+      {selectedDate ? <ActivitiesContainer activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
@@ -68,6 +71,7 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  height: 100%;
   gap: 18px;
 
   h2 {

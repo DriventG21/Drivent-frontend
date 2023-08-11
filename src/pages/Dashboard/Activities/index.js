@@ -16,6 +16,7 @@ const PageContainerStyle = styled.div`
   gap: 36px;
   max-height: 100%;
   overflow-y: scroll;
+  
   ::-webkit-scrollbar {
     display: none;
   }
