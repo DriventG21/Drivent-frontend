@@ -3,36 +3,40 @@ import ActivityCard from './ActivityCard.js';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import useRegisterInActivity from '../../../hooks/api/usePostActivity.js';
-
-/* eslint-disable */ /////////////////////////////////////////////
+import httpstatus from 'http-status';
 
 export default function ActivitiesContainer({ activities: realActivities }) {
   const [activities, setActivities] = useState([...realActivities]); ///////////////
-  const { postActivityLoading, postActivityError, postRegisterInActivity } = useRegisterInActivity()
+  const { postActivityLoading, postActivityError, postRegisterInActivity } = useRegisterInActivity();
 
   useEffect(() => {
-    if (postActivityError) toast(postActivityError.response.data);
-  }, [postActivityError])
+    if (postActivityError) {
+      if (postActivityError.response.date) toast(postActivityError.response.data);
+      else toast(httpstatus[postActivityError.response.status]);
+    }
+  }, [postActivityError]);
 
   useEffect(() => {
     setActivities(activities.map(e => {
       if (e.id === 2) return ({ ...e, userIsRegistered: true }); /////////////
-      else return ({ ...e, userIsRegistered: false });///////////////
-    }))
+      else return ({ ...e, userIsRegistered: false }); ///////////////
+    }));
   }, []);
 
   function registerInActivity(id) {
-    const selectedActivity = activities.find(e => e.id === id);
-    if (isUserTimeFree(selectedActivity)) toast('Inscrito em outra atividade neste horario');
-    else {
-      postRegisterInActivity({ activityId: id });
+    if (!postActivityLoading) {
+      const selectedActivity = activities.find(e => e.id === id);
+      if (isUserTimeFree(selectedActivity)) toast('Inscrito em outra atividade neste horario');
+      else {
+        postRegisterInActivity({ activityId: id });
+      }
     }
   }
 
   function isUserTimeFree(selectedActivity) {
     return activities.filter(e => e.userIsRegistered === true).some(e =>
-      selectedActivity.startAtDateTime >= e.startAtDateTime && selectedActivity.startAtDateTime < e.endAtDateTime
-      || selectedActivity.endAtDateTime >= e.startAtDateTime && selectedActivity.endAtDateTime < e.endAtDateTime);
+      (selectedActivity.startAtDateTime >= e.startAtDateTime && selectedActivity.startAtDateTime < e.endAtDateTime)
+      || (selectedActivity.endAtDateTime >= e.startAtDateTime && selectedActivity.endAtDateTime < e.endAtDateTime));
   }
 
   return (
@@ -56,7 +60,7 @@ export default function ActivitiesContainer({ activities: realActivities }) {
         </div>
       </div>
     </MyContainer>
-  )
+  );
 }
 
 const MyContainer = styled.div`

@@ -4,8 +4,6 @@ import useActivity from '../../../hooks/api/useActivity';
 import DateButton from './DateButton.js';
 import ActivitiesContainer from './ActivitiesContainer.js';
 
-/* eslint-disable */ /////////////////////////////////////////////////////////
-
 const weekDays = [
   'Domingo',
   'Segunda',
@@ -30,7 +28,6 @@ export default function ActivityListing() {
   useEffect(() => {
     if (activities) {
       const dates = [];
-      console.log(activities);
       for (const i of activities) {
         i.startAtDateTime = new Date(i.startAt);
         i.endAtDateTime = new Date(i.endAt);

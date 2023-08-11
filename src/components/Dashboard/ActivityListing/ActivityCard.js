@@ -3,20 +3,17 @@ import styled from 'styled-components';
 import { CgEnter } from 'react-icons/cg';
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
-/* eslint-disable */ ///////////////////////////////////////
-
-export default function ActivityCard({ activity: realActivity, registerInActivity }) {
+export default function ActivityCard({ activity, registerInActivity }) {
   const [height, setHeight] = useState(0);
-  const [activity, setActivity] = useState({ ...realActivity }) ////////////////
 
   useEffect(() => {
-    if (activity.id === 2) setActivity({ ...activity, userIsRegistered: true }); /////////////
-    else setActivity({ ...activity, userIsRegistered: false });///////////////
+    // if (activity.id === 2) setActivity({ ...activity, userIsRegistered: true }); /////////////
+    // else setActivity({ ...activity, userIsRegistered: false });///////////////
 
     const startAtHour = activity.startAt.substring(11, 13);
     const endAtHour = activity.endAt.substring(11, 13);
     setHeight(`${(endAtHour - startAtHour - 1) * 80}px`);
-  }, [realActivity]); ///////////////////////////////
+  }, [activity]); ///////////////////////////////
 
   return (
     <MyCard myHeight={height} myBackgroud={activity.userIsRegistered ? '#D0FFDB' : '#F1F1F1'} >
@@ -54,14 +51,14 @@ const InfoContainer = styled.div`
 
   p{
     color: #343434;
-    font-family: Roboto;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
     font-size: 18px;
     font-weight: 600;
   }
 
   span{
     color: #343434;
-    font-family: Roboto;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
     font-size: 16px;
     font-weight: 400;
   }
@@ -82,7 +79,7 @@ const IconContainer = styled.div`
 
   span{
     color: ${props => props.myColor};
-    font-family: Roboto;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
     font-size: 15px;
     font-weight: 400;
   }
