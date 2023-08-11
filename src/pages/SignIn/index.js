@@ -1,13 +1,15 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { FaGithub } from 'react-icons/fa';
 
 import AuthLayout from '../../layouts/Auth';
 
 import Input from '../../components/Form/Input';
 import Button from '../../components/Form/Button';
 import Link from '../../components/Link';
-import { Row, Title, Label } from '../../components/Auth';
+import { Row, Title, Label, GithubButton, GithubText } from '../../components/Auth';
 
 import EventInfoContext from '../../contexts/EventInfoContext';
 import UserContext from '../../contexts/UserContext';
@@ -24,19 +26,42 @@ export default function SignIn() {
   const { setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
-  
+
+  async function getUserData() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const reqParams = urlParams.get('code');
+    if (reqParams) {
+      const { data: userData } = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/auth/sign-in/github/${reqParams}`
+      );
+      setUserData(userData);
+      navigate('/dashboard');
+      toast('Login realizado com sucesso!');
+    }
+  }
+
+  useEffect(() => {
+    getUserData();
+  }, [setUserData, toast, navigate]);
+
   async function submit(event) {
     event.preventDefault();
 
     try {
       const userData = await signIn(email, password);
       setUserData(userData);
-      toast('Login realizado com sucesso!');
       navigate('/dashboard');
+      toast('Login realizado com sucesso!');
     } catch (err) {
       toast('Não foi possível fazer o login!');
     }
-  } 
+  }
+
+  function loginWithGithub() {
+    window.location.assign(`
+    https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`);
+  }
 
   return (
     <AuthLayout background={eventInfo.backgroundImageUrl}>
@@ -47,13 +72,26 @@ export default function SignIn() {
       <Row>
         <Label>Entrar</Label>
         <form onSubmit={submit}>
-          <Input label="E-mail" type="text" fullWidth value={email} onChange={e => setEmail(e.target.value)} />
-          <Input label="Senha" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} />
-          <Button type="submit" color="primary" fullWidth disabled={loadingSignIn}>Entrar</Button>
+          <Input label="E-mail" type="text" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input
+            label="Senha"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button type="submit" color="primary" fullWidth disabled={loadingSignIn}>
+            Entrar
+          </Button>
         </form>
       </Row>
       <Row>
         <Link to="/enroll">Não possui login? Inscreva-se</Link>
+        <GithubButton onClick={loginWithGithub}>
+          <FaGithub size={20} color={'white'} />
+          <GithubText>LOGIN COM GITHUB
+          </GithubText>
+        </GithubButton>
       </Row>
     </AuthLayout>
   );
