@@ -5,8 +5,8 @@ import { toast } from 'react-toastify';
 import useRegisterInActivity from '../../../hooks/api/usePostActivity.js';
 import httpstatus from 'http-status';
 
-export default function ActivitiesContainer({ activities: realActivities, getActivities }) {
-  const [activities, setActivities] = useState([...realActivities]); ///////////////
+export default function ActivitiesContainer({ activities: realActivities, activitiesLoading, getActivities }) { // trocar os parametros por { activities, activitiesLoading, getActivities } 
+  const [activities, setActivities] = useState([...realActivities]); /////////////// remover essa linha inteira
   const { postActivityLoading, postActivityError, postRegisterInActivity } = useRegisterInActivity();
 
   useEffect(() => {
@@ -16,15 +16,15 @@ export default function ActivitiesContainer({ activities: realActivities, getAct
     }
   }, [postActivityError]);
 
-  useEffect(() => {
-    setActivities(activities.map(e => {
+  useEffect(() => { /////////////////// remover esse useEffect inteiro
+    setActivities(activities.map(e => { ////////////////////
       if (e.id === 2) return ({ ...e, userIsRegistered: true }); /////////////
       else return ({ ...e, userIsRegistered: false }); ///////////////
     }));
   }, []);
 
   function registerInActivity(id) {
-    if (!postActivityLoading) {
+    if (!(postActivityLoading || activitiesLoading)) {
       const selectedActivity = activities.find(e => e.id === id);
       if (isUserTimeFree(selectedActivity)) toast('Inscrito em outra atividade neste horario');
       else {
