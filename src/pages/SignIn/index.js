@@ -15,6 +15,7 @@ import EventInfoContext from '../../contexts/EventInfoContext';
 import UserContext from '../../contexts/UserContext';
 
 import useSignIn from '../../hooks/api/useSignIn';
+import { loginWithGithub } from '../../utils/loginWithGithub';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -56,11 +57,6 @@ export default function SignIn() {
     } catch (err) {
       toast('Não foi possível fazer o login!');
     }
-  }
-
-  function loginWithGithub() {
-    window.location.assign(`
-    https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`);
   }
 
   return (

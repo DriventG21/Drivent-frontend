@@ -13,6 +13,7 @@ import Link from '../../components/Link';
 import EventInfoContext from '../../contexts/EventInfoContext';
 
 import useSignUp from '../../hooks/api/useSignUp';
+import { loginWithGithub } from '../../utils/loginWithGithub';
 
 export default function Enroll() {
   const [email, setEmail] = useState('');
@@ -39,11 +40,6 @@ export default function Enroll() {
         toast('Não foi possível fazer o cadastro!');
       }
     }
-  }
-
-  function loginWithGithub() {
-    window.location.assign(`
-    https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`);
   }
 
   return (
