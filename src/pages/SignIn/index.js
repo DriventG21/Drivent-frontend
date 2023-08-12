@@ -84,7 +84,7 @@ export default function SignIn() {
       <Row>
         <Link to="/enroll">Não possui login? Inscreva-se</Link>
         <GithubButton onClick={loginWithGithub}>
-          <FaGithub />
+          <FaGithub size={20} color={'white'} />
           <GithubText>LOGIN COM GITHUB
           </GithubText>
         </GithubButton>
