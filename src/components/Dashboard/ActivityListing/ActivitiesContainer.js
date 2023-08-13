@@ -5,8 +5,7 @@ import { toast } from 'react-toastify';
 import useRegisterInActivity from '../../../hooks/api/usePostActivity.js';
 import httpstatus from 'http-status';
 
-export default function ActivitiesContainer({ activities: realActivities, activitiesLoading, getActivities }) { // trocar os parametros por { activities, activitiesLoading, getActivities } 
-  const [activities, setActivities] = useState([...realActivities]); /////////////// remover essa linha inteira
+export default function ActivitiesContainer({ activities, activitiesLoading, getActivities }) {
   const { postActivityLoading, postActivityError, postRegisterInActivity } = useRegisterInActivity();
 
   useEffect(() => {
@@ -15,13 +14,6 @@ export default function ActivitiesContainer({ activities: realActivities, activi
       else toast(httpstatus[postActivityError.response.status]);
     }
   }, [postActivityError]);
-
-  useEffect(() => { /////////////////// remover esse useEffect inteiro
-    setActivities(activities.map(e => { ////////////////////
-      if (e.id === 2) return ({ ...e, userIsRegistered: true }); /////////////
-      else return ({ ...e, userIsRegistered: false }); ///////////////
-    }));
-  }, []);
 
   function registerInActivity(id) {
     if (!(postActivityLoading || activitiesLoading)) {
@@ -45,19 +37,19 @@ export default function ActivitiesContainer({ activities: realActivities, activi
       <div>
         <h3>Auditório Principal</h3>
         <div>
-          {activities.filter(e => e.local === 'MAIN').map(activity => <ActivityCard key={activity.id} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'MAIN').map(activity => <ActivityCard key={{ id: activities.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
       <div>
         <h3>Auditório Lateral</h3>
         <div>
-          {activities.filter(e => e.local === 'SIDE').map(activity => <ActivityCard key={activity.id} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'SIDE').map(activity => <ActivityCard key={{ id: activities.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
       <div>
         <h3>Sala de Workshop</h3>
         <div>
-          {activities.filter(e => e.local === 'WORKSHOP').map(activity => <ActivityCard key={activity.id} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'WORKSHOP').map(activity => <ActivityCard key={{ id: activities.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
     </MyContainer>
