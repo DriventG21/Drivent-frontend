@@ -46,7 +46,7 @@ export default function ActivityListing() {
   }
 
   if (activitiesError) {
-    if (Number(activitiesError?.message.slice(-3)) === 402) {
+    if (activitiesError.response.status === 402) {
       return (
         <ErrorContainer>
           <p>Você precisa ter confirmado pagamento antes
@@ -55,7 +55,7 @@ export default function ActivityListing() {
       );
     }
 
-    if (Number(activitiesError?.message.slice(-3)) === 403) {
+    if (activitiesError.response.status === 403) {
       return (
         <ErrorContainer>
           <p>Sua modalidade de ingresso não necessita escolher
