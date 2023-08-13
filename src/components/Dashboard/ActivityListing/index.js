@@ -45,34 +45,36 @@ export default function ActivityListing() {
     setSelectedDate(date);
   }
 
-  if (activitiesError?.status === 402) {
-    return (
-      <ErrorContainer>
-        <p>Você precisa ter confirmado pagamento antes
-          de fazer a escolha de atividades</p>
-      </ErrorContainer>
-    );
-  }
+  if (activitiesError) {
+    if (Number(activitiesError?.message.slice(-3)) === 402) {
+      return (
+        <ErrorContainer>
+          <p>Você precisa ter confirmado pagamento antes
+            de fazer a escolha de atividades</p>
+        </ErrorContainer>
+      );
+    }
 
-  if (activitiesError?.status === 400) {
-    return (
-      <ErrorContainer>
-        <p>Sua modalidade de ingresso não necessita escolher
-          atividade. Você terá acesso a todas as atividades.</p>
-      </ErrorContainer>
-    );
+    if (Number(activitiesError?.message.slice(-3)) === 403) {
+      return (
+        <ErrorContainer>
+          <p>Sua modalidade de ingresso não necessita escolher
+            atividade. Você terá acesso a todas as atividades.</p>
+        </ErrorContainer>
+      );
+    }
   }
 
   return (
     <PageContainer>
       <h2>Primeiro, filtre pelo dia do evento:</h2>
 
-      {dates && !activitiesLoading ?
+      {dates ?
         <DatesContainer>
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
         : null}
-      {selectedDate ? <ActivitiesContainer key={selectedDate} activitiesLoading={activitiesLoading} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
+      {selectedDate && !activitiesLoading ? <ActivitiesContainer key={selectedDate} activitiesLoading={activitiesLoading} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
