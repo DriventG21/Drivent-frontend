@@ -10,7 +10,7 @@ import pdfGen from '../../../utils/PDFGenerator';
 export default function Certificate() {
   const { certificateError, certificateLoading } = useCertificate();
   const [errorMsg, setErrorMsg] = useState(null);
-  const { genCertificate } = useGenCertificate();
+  const { genCertificate } = useGenCertificate(false);
   const [loading, setLoading] = useState(false);
   const [firstLoading, setFirstLoading] = useState(false);
 
@@ -20,6 +20,7 @@ export default function Certificate() {
         const errors = {
           'Ticket not paid': 'Você não participou do evento.',
           'Event is still ongoing': 'O certificado ficará disponível apenas 1 dia após a realização do evento.',
+          'Not enough activities enrolled': 'Você não se inscreveu em atividades suficientes',
         };
         setErrorMsg(errors[certificateError.response.data]);
       }
