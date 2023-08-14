@@ -12,7 +12,7 @@ export default function ActivityCard({ activity, registerInActivity }) {
 
     const startAtHour = activity.startAt.substring(11, 13);
     const endAtHour = activity.endAt.substring(11, 13);
-    setHeight(`${(endAtHour - startAtHour - 1) * 80}px`);
+    setHeight(`${(endAtHour - startAtHour) * 80}px`);
   }, [activity]); ///////////////////////////////
 
   return (
