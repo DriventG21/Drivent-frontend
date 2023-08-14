@@ -37,19 +37,19 @@ export default function ActivitiesContainer({ activities, activitiesLoading, get
       <div>
         <h3>Auditório Principal</h3>
         <div>
-          {activities.filter(e => e.local === 'MAIN').map(activity => <ActivityCard key={{ id: activity.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'MAIN').map(activity => <ActivityCard key={activity.userIsRegistered ? activity.id : activity.id * -1} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
       <div>
         <h3>Auditório Lateral</h3>
         <div>
-          {activities.filter(e => e.local === 'SIDE').map(activity => <ActivityCard key={{ id: activity.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'SIDE').map(activity => <ActivityCard key={activity.userIsRegistered ? activity.id : activity.id * -1} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
       <div>
         <h3>Sala de Workshop</h3>
         <div>
-          {activities.filter(e => e.local === 'WORKSHOP').map(activity => <ActivityCard key={{ id: activity.id, userIsRegistered: activity.userIsRegistered }} activity={activity} registerInActivity={registerInActivity} />)}
+          {activities.filter(e => e.local === 'WORKSHOP').map(activity => <ActivityCard key={activity.userIsRegistered ? activity.id : activity.id * -1} activity={activity} registerInActivity={registerInActivity} />)}
         </div>
       </div>
     </MyContainer>

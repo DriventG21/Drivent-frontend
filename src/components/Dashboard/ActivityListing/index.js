@@ -37,6 +37,7 @@ export default function ActivityListing() {
         i.dayWithWeekDay = dayWithWeekDay;
         if (!dates.includes(dayWithWeekDay)) dates.push(dayWithWeekDay);
       }
+      activities.sort((a, b) => a.startAtDateTime - b.startAtDateTime);
       setDates(dates);
     }
   }, [activities]);
