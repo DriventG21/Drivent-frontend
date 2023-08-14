@@ -7,13 +7,10 @@ export default function ActivityCard({ activity, registerInActivity }) {
   const [height, setHeight] = useState(0);
 
   useEffect(() => {
-    // if (activity.id === 2) setActivity({ ...activity, userIsRegistered: true }); /////////////
-    // else setActivity({ ...activity, userIsRegistered: false });///////////////
-
     const startAtHour = activity.startAt.substring(11, 13);
     const endAtHour = activity.endAt.substring(11, 13);
-    setHeight(`${(endAtHour - startAtHour - 1) * 80}px`);
-  }, [activity]); ///////////////////////////////
+    setHeight(`${(endAtHour - startAtHour) * 80}px`);
+  }, [activity]);
 
   return (
     <MyCard myHeight={height} myBackgroud={activity.userIsRegistered ? '#D0FFDB' : '#F1F1F1'} >

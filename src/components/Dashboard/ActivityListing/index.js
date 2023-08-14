@@ -17,6 +17,8 @@ const weekDays = [
 export default function ActivityListing() {
   const {
     activities,
+    activitiesError,
+    activitiesLoading,
     getActivities
   } = useActivity();
 
@@ -35,12 +37,33 @@ export default function ActivityListing() {
         i.dayWithWeekDay = dayWithWeekDay;
         if (!dates.includes(dayWithWeekDay)) dates.push(dayWithWeekDay);
       }
+      activities.sort((a, b) => a.startAtDateTime - b.startAtDateTime);
       setDates(dates);
     }
   }, [activities]);
 
   function dateClickHandler(date) {
     setSelectedDate(date);
+  }
+
+  if (activitiesError) {
+    if (activitiesError.response.status === 402) {
+      return (
+        <ErrorContainer>
+          <p>Você precisa ter confirmado pagamento antes
+            de fazer a escolha de atividades</p>
+        </ErrorContainer>
+      );
+    }
+
+    if (activitiesError.response.status === 403) {
+      return (
+        <ErrorContainer>
+          <p>Sua modalidade de ingresso não necessita escolher
+            atividade. Você terá acesso a todas as atividades.</p>
+        </ErrorContainer>
+      );
+    }
   }
 
   return (
@@ -52,7 +75,7 @@ export default function ActivityListing() {
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
         : null}
-      {selectedDate ? <ActivitiesContainer key={selectedDate} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
+      {selectedDate ? <ActivitiesContainer key={selectedDate} activitiesLoading={activitiesLoading} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
@@ -94,5 +117,18 @@ const PageContainer = styled.div`
       background-color: #c9c6c6;
       border-radius: 4px;
     }
+  }
+`;
+
+const ErrorContainer = styled(PageContainer)`
+  justify-content: center;
+  align-items: center;
+
+  p{
+    color: #8E8E8E;
+    text-align: center;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
   }
 `;
