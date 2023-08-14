@@ -74,7 +74,7 @@ export default function ActivityListing() {
           {dates.map(e => <DateButton key={e} date={e} isSelected={selectedDate === e} clickHandler={dateClickHandler} />)}
         </DatesContainer>
         : null}
-      {selectedDate && !activitiesLoading ? <ActivitiesContainer key={selectedDate} activitiesLoading={activitiesLoading} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
+      {selectedDate ? <ActivitiesContainer key={selectedDate} activitiesLoading={activitiesLoading} getActivities={getActivities} activities={activities.filter(e => e.dayWithWeekDay === selectedDate)} /> : null}
     </PageContainer>
   );
 }
