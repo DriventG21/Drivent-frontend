@@ -15,13 +15,13 @@ export default function ActivitiesContainer({ activities, activitiesLoading, get
     }
   }, [postActivityError]);
 
-  function registerInActivity(id) {
+  async function registerInActivity(id) {
     if (!(postActivityLoading || activitiesLoading)) {
       const selectedActivity = activities.find(e => e.id === id);
       if (isUserTimeFree(selectedActivity)) toast('Inscrito em outra atividade neste horario');
       else {
-        postRegisterInActivity({ activityId: id });
-        getActivities();
+        await postRegisterInActivity({ activityId: id });
+        await getActivities();
       }
     }
   }
